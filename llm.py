@@ -2,9 +2,7 @@ import json
 import re
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# -------------------------
-# Model setup (CPU only)
-# -------------------------
+#model setup (CPU only)
 MODEL_ID = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -15,16 +13,14 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="cpu"        # Uses accelerate internally
 )
 
-# IMPORTANT: no `device` argument here
+#no `device` argument here
 generator = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer
 )
 
-# -------------------------
-# JSON extraction
-# -------------------------
+#extracting json
 def extract_json(text: str):
     match = re.search(r"\{[\s\S]*?\}", text)
     if not match:
@@ -32,9 +28,7 @@ def extract_json(text: str):
     return json.loads(match.group())
 
 
-# -------------------------
-# LLM call
-# -------------------------
+#calling llm, passing in json
 def generate_json(user_prompt: str):
     prompt = f"""
 Return ONLY valid JSON.
