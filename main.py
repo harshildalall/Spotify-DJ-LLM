@@ -4,9 +4,7 @@ from llm import generate_json
 
 app = FastAPI()
 
-# -------------------------
-# Load songs at startup
-# -------------------------
+#load songs at startup
 songs = []
 
 with open("songs.csv", newline="", encoding="utf-8") as f:
@@ -15,9 +13,7 @@ with open("songs.csv", newline="", encoding="utf-8") as f:
         songs.append(row)
 
 
-# -------------------------
-# Scoring function
-# -------------------------
+#scoring each song based on features
 def score_song(song, prefs):
     score = 0
 
@@ -33,9 +29,7 @@ def score_song(song, prefs):
     return score
 
 
-# -------------------------
-# DJ endpoint
-# -------------------------
+#dj endpoint
 @app.post("/dj")
 def dj(request: dict):
     prompt = request["prompt"]
