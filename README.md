@@ -14,10 +14,9 @@ Runs entirely local (no external APIs or keys)
 
 **Project Structure**
 spotify_dj/
-├── main.py        # FastAPI backend + song matching
-├── llm.py         # TinyLlama JSON generator
-├── songs.csv      # Song dataset
-└── requirements.txt
+main.py        # FastAPI backend + song matching
+llm.py         # TinyLlama JSON generator
+songs.csv      # Song dataset
 
 **Run Locally**
 git clone <repo-url>
