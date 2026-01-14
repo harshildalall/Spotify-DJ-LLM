@@ -6,9 +6,9 @@ A fully local music recommender that uses a TinyLlama LLM + FastAPI to turn natu
 
 Converts prompts like “late night chill rnb” into structured JSON
 
-Matches JSON to a CSV of ~100 songs
+Matches JSON to a CSV of ~300 songs
 
-Returns a recommended queue
+Returns a recommended queue/playlist
 
 Runs entirely local (no external APIs or keys)
 
