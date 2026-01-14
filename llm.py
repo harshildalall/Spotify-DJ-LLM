@@ -2,9 +2,7 @@ import json
 import re
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# -------------------------
-# Model setup (CPU only)
-# -------------------------
+#model setup (cpu only)
 MODEL_ID = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -15,32 +13,30 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="cpu"        # Uses accelerate internally
 )
 
-# IMPORTANT: no `device` argument here
+#important: no device argument here
 generator = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer
 )
 
-# -------------------------
-# JSON extraction
-# -------------------------
+#extracting json
 def extract_json(text: str):
-    # Remove markdown code blocks if present
+    #remove markdown code blocks if present
     text = text.strip()
     
-    # Remove ```json or ``` at the start
+    #remove ```json or ``` at the start
     if text.startswith("```"):
         lines = text.split("\n")
-        # Remove first line if it's just ``` or ```json
+        #remove first line if it's just ``` or ```json
         if lines[0].strip() in ["```", "```json", "```JSON"]:
             lines = lines[1:]
-        # Remove last line if it's just ```
+        #remove last line if it's just ```
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
         text = "\n".join(lines)
     
-    # Find JSON object in text
+    #find JSON object in text
     match = re.search(r"\{[\s\S]*?\}", text)
     if not match:
         raise ValueError("No JSON found in LLM output:\n" + text)
@@ -53,9 +49,7 @@ def extract_json(text: str):
         raise ValueError(f"Invalid JSON in LLM output:\n{json_str}\nError: {str(e)}")
 
 
-# -------------------------
-# LLM call
-# -------------------------
+#calling LLM
 def generate_json(user_prompt: str):
     prompt = f"""
 Return ONLY valid JSON.
@@ -97,11 +91,11 @@ JSON:
 
     result = extract_json(output)
     
-    # Ensure all fields exist with defaults
+    #ensure all fields exist with defaults
     if "associated_words" not in result:
         result["associated_words"] = []
     else:
-        # Deduplicate and clean associated words
+        #deduplicate and clean associated words
         seen = set()
         cleaned_words = []
         for word in result["associated_words"]:
@@ -115,16 +109,16 @@ JSON:
     if "artist" not in result:
         result["artist"] = ""
     else:
-        # Clean artist name
+        #clean artist name
         result["artist"] = result["artist"].strip()
     
-    # Fallback: Try to extract artist from prompt if LLM didn't catch it
+    #try to extract artist from prompt if LLM didn't catch
     if not result["artist"] and user_prompt:
-        # Common artist name patterns in prompts
+        #common artist name patterns in prompts
         import re
-        # Look for patterns like "artist name mix", "artist name songs", etc.
+        #look for patterns like "artist name mix", "artist name songs", etc.
         prompt_lower = user_prompt.lower()
-        # List of known artists (extracted from common patterns)
+        #list of known artists (extracted from common patterns) -- improve algorithm for this
         known_artists = [
             "travis scott", "frank ocean", "drake", "taylor swift", "the weeknd",
             "kanye west", "kendrick lamar", "arctic monkeys", "childish gambino",
@@ -133,7 +127,7 @@ JSON:
         ]
         for artist in known_artists:
             if artist in prompt_lower:
-                # Extract full artist name from prompt
+                #extract full artist name from prompt
                 pattern = rf"\b{re.escape(artist)}\b"
                 match = re.search(pattern, user_prompt, re.IGNORECASE)
                 if match:
@@ -150,3 +144,4 @@ JSON:
         result["tempo"] = ""
     
     return result
+    
